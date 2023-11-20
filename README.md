@@ -155,10 +155,38 @@ uses java.sql.Driver
 2) Named Modules / Application Modules --> this is what we build. this is what build.
 this contains module-info.java ==> module-info.class
 
+a) Single project can also contain multiple modules
+
+javac --module-source-path src -m main.app,core.app  -d out
+java --module-path out -m main.app/example.app.AppMain
+
+-m is module
+--module-path instead of -cp [classpath]
+-p is short cut of --module-path
 
 File -> New Project --> Intellij with Java; Name :moduleexample
 
 module name as reverse-domain ==> artifactID + groupId
+
+
+3) Automatic Modules
+We can add unofficial existing "jar" files [without module-info.jar] to module path.
+many libraries as of now are not JPMS based including "spring libraries" --> not named module
+
+javac --module-path "spring.core.jar" 
+spring becomes automatic modules; normaly name of the jar becomes the module name or if the jar contains MANIFEST.MF file --> where module name can be mentioned
+
+module myapp {
+	requires spring.beans;
+	requires spring.core;
+}
+
+4) unnamed module:
+jar file is added to classpath, but not to module path.
+--> for downward comptibility
+jar if it contains module-info.java --> it's ignored. everything in jar which is public is accessble
+
+
 
 ```
 module moduleexample {
@@ -171,10 +199,46 @@ module sample {
 }
 ```
 
-Resume @ 11:25
+moduleexample --> Named Module
+with 2 packages
+module moduleexample {
+    exports com.adobe.prj.service; // what packages are exported
+}
+
+sample --> Named module
+is using moduleexample
+module sample {
+    requires moduleexample; // which module is used 
+}
+
+Intellij we need to Module dependencies [sample needs moduleexample]
+--> Add module-path and not classpath
 
 
+ServiceLoader upto Java 8:
+in client
+META-INF/services/com.example.CodecFactory	
+com.example.impl.StandardCodecs # Standard codecs
 
 
+mvn package
 
+creates "jar" files
+
+Windows:
+java -p client/target/client-1.0.0.jar;api/target/api-1.0.0.jar;impl/target/impl-1.0.0.jar -m client/client.Main
+
+Mac:
+java -p client/target/client-1.0.0.jar:api/target/api-1.0.0.jar:impl/target/impl-1.0.0.jar -m client/client.Main
+
+--
+Create Image:
+
+```
+The jlink tool links a set of modules, along with their transitive dependencies, to create a custom runtime image.
+
+jlink --module-path client/target/client-1.0.0.jar:api/target/api-1.0.0.jar:impl/target/impl-1.0.0.jar --add-modules client,api,impl --output myimage --launcher MYAPP=client/client.Main
+
+myimage/bin> ./MYAPP
+```
 
