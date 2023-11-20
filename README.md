@@ -19,7 +19,10 @@ Softwares Required:
 1)  openJDK 17
 https://jdk.java.net/java-se-ri/17
 
-2) IntelliJ Ultimate edition or
+2) IntelliJ Ultimate edition 
+https://www.jetbrains.com/idea/download/?section=mac
+
+OR
 
 Eclipse for JEE  
 	https://www.eclipse.org/downloads/packages/release/2022-09/r/eclipse-ide-enterprise-java-and-web-developers
