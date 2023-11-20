@@ -2,14 +2,16 @@
 
 Banuprakash C
 
-Full Stack Architect, Co-founder Lucida Technologies Pvt Ltd., Corporate Trainer,
+Full Stack Architect, Corporate Trainer
+
+Co-founder & CTO: Lucida Technologies Pvt Ltd., 
 
 Email: banuprakashc@yahoo.co.in
+
 
 https://www.linkedin.com/in/banu-prakash-50416019/
 
 https://github.com/BanuPrakash/ADOBE_Java17_Spring
-
 
 ===================================
 
@@ -17,7 +19,9 @@ Softwares Required:
 1)  openJDK 17
 https://jdk.java.net/java-se-ri/17
 
-2) Eclipse for JEE  
+2) IntelliJ Ultimate edition or
+
+Eclipse for JEE  
 	https://www.eclipse.org/downloads/packages/release/2022-09/r/eclipse-ide-enterprise-java-and-web-developers
 
 3) MySQL  [ Prefer on Docker]
