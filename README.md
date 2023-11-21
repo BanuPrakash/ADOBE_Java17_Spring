@@ -242,3 +242,221 @@ jlink --module-path client/target/client-1.0.0.jar:api/target/api-1.0.0.jar:impl
 myimage/bin> ./MYAPP
 ```
 
+Day 2
+
+Recap:
+Java 9 feature --> JPMS
+module <module-name> {
+	exports package
+	requires module
+	provides Interface with Impl
+	uses Interface
+}
+
+* system-modules --> jdk 9+ ==> ~70 modules are there
+java.base mandated --> no need for requires java.base;
+requires java.sql; --> explicitly added
+
+* Named module --> contains module-info.java
+
+* Automatic modules --> any jar added to module-path [not classpath] 
+* unnamed module --> no module-info.jar and we use classpath
+
+--> JLink to create a Image --> image size will be mianture one compared to full JDK [rt.jar and jce.jar] used
+
+--> Maven Module and JPMS module
+
+--------------------------------
+
+sealed: Java 15
+-> sealed, final
+
+1) A sealed type has a fixed set of direct subtypes
+2) direct subtype must be listed in "permits" clause.
+3) If a single source file contains subtypes then no need for "permits"
+4) direct subtypes of a sealed type must be final, sealed or non-sealed
+5) Helps in java 19 pattern matching
+
+```
+sealed interface JSONValue permits JSONObject,JSONArray, JSONPrimitive  {
+}
+
+final class JSONObject implements JSONValue {
+
+}
+
+final class JSONArray implements JSONValue {
+
+}
+
+sealed class JSONPrimitive implements JSONValue permits JSONString, JSONBoolean, JSONNumber{
+}
+
+final class JSONString extends JSONPrimitive {
+
+}
+
+------
+
+sealed class Node permits Element, CDATASection, Text, Comment {
+
+}
+
+final class Text extends Node {
+
+}
+
+// Elements has many HTML Elements like HTMLInputElement, HTMLButtonElement, HTMLDivElement
+non-sealed class Element extends Node {
+
+}
+
+we can have:
+
+class HTMLInputElement extends Element {
+
+}
+
+```
+
+Pattern matching: preview feature in 17.
+
+TrafficLight.java
+```
+public sealed interface TrafficLight { // no need for permits if subtypes are in single source file
+}
+
+final class RedLight implements  TrafficLight {}
+final class GreenLight implements  TrafficLight {}
+final class YellowLight implements  TrafficLight {}
+
+```
+Main.java
+```
+// no need for default because we have fixed sub-types
+public class Main {
+    public static void main(String[] args) {
+        TrafficLight light = new RedLight();
+        return switch (light) {
+            case RedLight r -> System.out.println("wait");
+            case YellowLight r -> System.out.println("ready");
+            case GreenLight r -> System.out.println("Go...");
+        }
+    }
+}
+```
+javac --source 17 --enable-preview -Xlint:preview *.java
+ java --enable-preview Main 
+
+--------
+java 9: jshell to execute statements, functions without a class and main()
+% jshell
+jshell> 
+
+
+java 12 introduced arrow operator,typecasted variable in statement
+
+```
+// upto java 11 feature
+Object obj = "Hello World";
+if(obj instanceof String) {
+	String s = (String) obj;
+	int len = s.length();
+	System.out.println(len);
+}
+
+// from java 12+
+Object obj = "Hello World";
+if(obj instanceof String s) {
+	int len = s.length();
+	System.out.println(len);
+}
+```
+
+Arrow in switch:
+
+```
+// java 13 introduced yield
+int getData(String mode) {
+	int result = switch(mode) {
+		case "a", "b" -> 1; // case "a", "b": yield 1;
+		case "c" -> 2;
+		default -> -1;
+	};
+	return result;
+}
+
+case "a","b": 
+	// do something
+	yield "done";
+
+```
+
+Record --> java 14
+Records --> to create immutable objects --> DTOs
+
+```
+public record PersonDTO(String name, int age){}
+// code has constructor, getters, equals, hashCode and toString()
+
+Person p = new PersonDTO("Sam", 35);
+p.getName(); // or p.name()
+
+looks like a @Value  of lombok
+
+Can override constructor
+public record PersonDTO(String name, int age) {
+	public PersonDTO {
+		if(age < 0) {
+			throw new IllegalArgumentException("name is not valid");
+		}
+	}
+
+	@Overide
+	public String name() {
+		return name.toUpperCase();
+	}
+}
+```
+
+Class Data Sharing [10] ==> built-in classes ==> classlist
+
+Classloader --> 
+	findLoadedClass(),loadClass(), findSystemClass(), verifyClass(), defineClass() --> time consuming process
+
+sudo java -Xshare:dump
+
+uses /Library/Java/JavaVirtualMachines/jdk-17.0.5.jdk/Contents/Home/lib/classlist and creates a memory mapped bytecode after doing load class, verify, define class:
+
+/Library/Java/JavaVirtualMachines/jdk-17.0.5.jdk/Contents/Home/lib/server/classes.jca
+
+Java 9 feature: execute "source code:
+java -Xshare:on -Xlog:class+load Sample.java >> a.txt
+java -Xshare:off -Xlog:class+load Sample.java >> a.txt
+
+ java 12: Application Data Sharing
+ can add our classes also into "memory mapped share"
+
+java -jar AppCDS.jar
+0.919 seconds
+
+java -XX:ArchiveClassesAtExit=appCDS.jsa -jar AppCDS.jar
+
+java -XX:SharedArchiveFile=appCDS.jsa -jar AppCDS.jar
+0.68 seconds 
+
+java -XX:SharedArchiveFile=a.jsa -XX:DumpLoadedClassList=test.lst Sample  
+
+Node instance --> appCDS.jsa
+
+pod1 
+java -XX:SharedArchiveFile=appCDS.jsa -jar AppCDS.jar
+pod2 
+java -XX:SharedArchiveFile=appCDS.jsa -jar AppCDS.jar
+
+JVM --> Metaspace, Stack, Heap
+
+======
+
+Resume @ 11:40
+
