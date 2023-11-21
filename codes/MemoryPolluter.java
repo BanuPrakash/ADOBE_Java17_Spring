@@ -7,7 +7,7 @@ public class MemoryPolluter {
         System.out.println("Starting pollution");
 
         for (int i = 0; i < ITERATION_COUNT; i++) {
-            byte[] array = new byte[MEGABYTE_IN_BYTES];
+            byte[] array = new byte[MEGABYTE_IN_BYTES]; // array has to be GC
         }
 
         System.out.println("Terminating");

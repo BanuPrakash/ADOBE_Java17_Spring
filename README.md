@@ -458,5 +458,219 @@ JVM --> Metaspace, Stack, Heap
 
 ======
 
-Resume @ 11:40
+* JPMS
+* Pattern Matching Switch statement
+* sealed
+* CDS
+* ADS
+* jshell
+* var --> java 11 feature
+*
+variables can be declared with "var" --> statically typed
+
+HashMap<String,List<String>> myData = new HashMap<String,List<String>>();
+becomes
+var myData = new HashMap<String,List<String>>();
+
+for(var data : myData.entrySet()) {
+
+}
+
+Where "Var" can't be used:
+1) var a; // cannot infer to a type
+2) var nothing = null;
+3) var lambda = () -> System.out.println("AAA");
+
+var usage in lambda parameters
+
+```
+ public static void main(String[] args) {
+        Predicate<Integer> p1 = (@NotNull Integer t) -> true; // regular way of using annotation
+       // Predicate<Integer> p2 = (@NotNull  t) -> true; // invalid
+        Predicate<Integer> p3 = (@NotNull var t) -> true; // regular way of using annotation
+
+    }
+```
+
+* Garbage Collection
+--> Concurrent Mark Sweep GC is depreicated --> Java 11
+EDEN Area / New Generation --> newly created objects reside
+Surviour Stage 1 and Surviour Stage 2 area was to used to move object which survied Short term GC [ collect unused objects in New Generation] into Old Generation
+Old Generation: any objects which survived 3 cycles of Short term GC was moved to Old Generation
+
+--> New GC 
+a) Epsilon GC: No-op GC
+allows memory allocation, no removing of unused memory
+ FinancialApp --> Start the app @ 9:00 and shutdown by 5:00
+
+ java MemoryPolluter 
+
+java -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC MemoryPolluter
+Terminating due to java.lang.OutOfMemoryError: Java heap space
+
+b) G1GC
+--> default
+
+---------------------
+
+* enahancements in Collection API
+takeWhile(), takeUtil(). teeing Collector
+
+----------------------
+
+Spring Boot 3 --> needs Java 17 version
+
+=========================================================
+
+Spring / Spring Boot and JPA
+
+Spring Framework : provided a Inversion of Control container for building enterprise application
+
+
+Bean --> any object managed by spring container is a bean
+
+Java 1.2 --> bean --> any re-usable software component
+
+
+Dependency Injection is done using IoC
+
+Spring Container is created using meta-data [XML or Annotation]
+
+using XML as metadata:
+```
+
+interface EmployeeDao {
+	addEmployee(Employee e);
+}
+
+public class EmployeeDaoMongoImpl implements EmployeeDao {
+	addEmployee(...)
+}
+
+public class EmployeeDaoSQLImpl implements EmployeeDao {
+	addemployee(...)
+}
+
+public class AppService {
+	EmployeeDao empDao; // loosly coupled
+
+	public void setDao(EmployeeDao edao) {
+		this.empDao = edao;
+	}
+
+	insert(Employee e) {
+		this.empDao.addEmployee(e);
+	}
+}
+
+beans.xml
+<beans>
+	<bean id="mongo" class="pkg.EmployeeDaoMongoImpl" />
+	<bean id="sql" class="pkg.EmployeeDaoSQLImpl" />
+	<bean id="service" class="pkg.AppService">
+		<property name="dao" ref="sql" />
+	</bean>
+</beans>
+
+ApplicationContext ctx = new ApplicationContext("beans.xml");
+```
+
+Using Annotation: 
+Advantage --> Java Compiler can check/validate
+XML --> SAXParser is required, IDE doesn't pick issues 
+
+```
+
+@Repository
+public class EmployeeDaoMongoImpl implements EmployeeDao {
+	addEmployee(...)
+}
+
+public class EmployeeDaoSQLImpl implements EmployeeDao {
+	addemployee(...)
+}
+
+@Service
+public class AppService {
+	@Autowired
+	EmployeeDao empDao; // loosly coupled
+	insert(Employee e) {
+		this.empDao.addEmployee(e);
+	}
+}
+
+AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+ctx.scan("com.adobe"); // scan com.adobe and it's sub packages for the below annotations at class-level
+ctx.refresh();
+
+
+1) @Component ==> utility 
+2) @Repository ==> CRUD
+3) @Service ==> Service Facade
+4) @Configuration ==> usually for reading configurations and factory methods
+5) @Controller ==> MVC
+6) @RestController ==> RESTful
+7) @ControllerAdvice ==> GlobalExceptionHandler for Web application
+
+and creates instances of the class
+
+a) @Service
+public class AppService {
+
+creates instance as "appService"
+
+b) @Repository
+public class EmployeeDaoMongoImpl implements EmployeeDao {
+
+creates instance as "employeeDaoMongoImpl"
+```
+
+Wiring can be done using @Autowired, @Inject or constructor DI
+
+Spring uses "Byte Buddy" , "Java Assist", "CG Lib" for byte-code instrumentation and creating proxies
+@Autowired
+EmployeeDao empDao;
+
+can get changed to
+EmployeeDao empDao = new EmployeeDaoJdbcImpl();
+or
+EmployeeDao empDao = EmployeeDao.factoryEmployeeDao();
+
+----------
+
+Spring Boot?
+* Framework on top of Spring Framweork
+Spring boot 2.x is a framework on top of Spring Framework 5.x
+Spring boot 3.x is a framework on top of Spring Framemork 6.x
+
+Why Spring boot?
+1) highly opiniated: lot's of configuration comes out of the box
+a) If we want to develop web application --> provides embedded Tomcat container
+b) If we use RDBMS --> provides DataSource [ pool of database connection] using HikariCP library
+c) if we use JPA/ORM --> provided Hibernate as JPA Vendor
+2) Not much difference between Standalone and Web based application ==> both are started using main()
+3) creation of Spring Container is already configured
+
+
+https://start.spring.io/
+
+1) @SpringBootApplication
+is made of 3 annoations
+a) @ComponentScan
+--> scans for above mentioned annoations in "com.adobe.springdemo" and it's sub-packages
+and creates instances of them
+com.example.springdemo <-- won't scan
+
+b) @EnableAutoConfiguration
+--> creates built-in configured objects --> highly opiniated
+create DataSource, JPAVendor
+
+create on ConditionalMissingBean, ConditionalOnProperty,,,
+
+c) @Configuration 
+
+2) SpringApplication.run(SpringDemoApplication.class, args);
+this creates a Spring Container
+
+ApplicationContext ctx = SpringApplication.run(SpringDemoApplication.class, args);
 
