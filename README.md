@@ -852,3 +852,55 @@ update: create table if not exists, use tables if exist, alter table if required
 verify: We already have tables--> use them if mapping is appropriate. Don't allow alter
 
 spring.jpa.hibernate.ddl-auto=update
+
+```
+products
+id  | name | price | qty | ver
+2	  A
+3 	  B
+
+customers
+email 			| first_name
+sam@adobe.com		Samantha
+rita@adobe.com		Rita
+
+orders
+oid | order_date 			| customer_fk 		| total
+120	  20-1-2023 4:30:12		  rita@adobe.com		98493
+121	  21-1-2023 5:12:10		  rita@adobe.com		9000
+
+
+items
+item_id | quantity | amount | product_fk | order_fk
+89			1			8989	3			120
+90			2			8222	2			120
+
+
+@JoinColumn with @ManyToOne FK is added to owning side
+@JoinColumn with @OneToMany FK is added to child side
+
+```
+
+CascadeType.ALL
+
+order has 5 items
+
+em.save(order); // this saves 5 items also
+
+em.delete(order); // this deletes order and it's entites
+
+
+Without cascade:
+em.save(order);
+em.save(item1);
+em.save(item2);
+em.save(item3);
+em.save(item4);
+em.save(item5);
+
+=====================
+
+
+
+
+
