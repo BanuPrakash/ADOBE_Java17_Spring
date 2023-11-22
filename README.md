@@ -674,3 +674,181 @@ this creates a Spring Container
 
 ApplicationContext ctx = SpringApplication.run(SpringDemoApplication.class, args);
 
+http://server/api/products
+
+@RequestMapping("api/products") searchs only in classes which are marked as @controller or @RestController
+
+@Repository
+Unified way of generating Exception for RDBMS
+https://github.com/spring-projects/spring-framework/blob/main/spring-jdbc/src/main/resources/org/springframework/jdbc/support/sql-error-codes.xml
+
+try {
+
+} catch(SQLException ex) {
+	if(ex.getErrorCode() === 2011) {
+		throw new DuplicateKeyException(ex.getMessage())
+	}
+}
+
+====
+
+Day 3:
+
+Recap: sealed, pattern matching, record, G1GC, EpsilonGC, var, jshell, ..
+Spring boot: @SpringBootApplication --> @ComponentScan, @EnableAutoConfiguration and @Configuration, @Autowired
+
+BeanFactory --> use it for only DependecyInjection
+ApplicationContext --> DI, multiple context [ integrate with other technologies, ...]
+
+More than one bean is qualified to be @Autowired
+```
+Solution 1: @Qualifier
+ @Autowired
+ @Qualifier("employeeDaoMongoImpl")
+ private EmployeeDao employeeDao; // loosely coupled wire by type
+
+Solution 2: @Primary
+
+Remove Qualifer and
+@Repository
+@Primary
+public class EmployeeDaoMongoImpl implements  EmployeeDao {
+
+Solution 3: @Profile
+@Repository
+@Profile("prod")
+public class EmployeeDaoMongoImpl implements  EmployeeDao {
+
+@Repository
+@Profile("dev")
+public class EmployeeDaoSqlImpl implements  EmployeeDao {
+
+a) application.properties / application.yml
+spring.profiles.active=prod
+
+b) Program Arguments
+Run > Edit Configurations > Active profile: dev
+
+Program arguments has high priority over application.properties
+
+System Properties > Program arguments > configuration file [application.properties / application.yml]
+
+Solution 4:
+@Repository
+@ConditionalOnMissingBean("employeeDaoMongoImpl")
+public class EmployeeDaoSqlImpl implements  EmployeeDao {
+}
+
+Solution 5:
+@ConditionalOnProperty(name = "dao", value = "MONGO")
+public class EmployeeDaoMongoImpl implements  EmployeeDao {
+
+application.properties
+dao=MONGO
+
+```
+
+Spring Factory methods:
+methods which return an object; returned object is managed by spring container
+* 3rd party classes doesn't contain @Component, @Repository, @Service ,,,
+* Customize way of creating object
+
+Building RESTful WS with JPA
+
+ORM --> Object Relational Mapping
+Java Object <----> Relational Database table
+fields <---> columns of database table
+
+ORM generates SQL for CRUD operations and provides apis to do the same
+
+ORM Frameworks: JDO, Hibernate, TopLink, KODO, OpenJPA, EclipseLink,....
+
+JavaPersistence API is a specification for ORMs
+
+Application --> JPA --> ORM Frameworks --> JDBC --> RDBMS
+
+ORM has default first level cache; can add second level cache
+
+PersistanceContext is a container to manage entities
+
+EntityManagerFactory
+
+====
+
+```
+@Configuration
+public class AppConfig {
+
+	// factory method
+	@Bean(name="dataSource")
+	public DataSource getDataSource() {
+		ComboPooledDataSource cpds = new ComboPooledDataSource();
+		cpds.setDriverClass( "org.postgresql.Driver" ); //loads the jdbc driver            
+		cpds.setJdbcUrl( "jdbc:postgresql://localhost/testdb" );
+		cpds.setUser("swaldman");                                  
+		cpds.setPassword("test-password");                                  
+		cpds.setMinPoolSize(5);                                     
+		cpds.setAcquireIncrement(5);
+		cpds.setMaxPoolSize(20);
+		return cpds;
+	}
+
+	@Bean
+	public LocalContainerEntityManagerFactory emf(DataSource ds) {
+		LocalContainerEntityManagerFactory emf = new LocalContainerEntityManagerFactory();
+		emf.setDataSource(ds);
+		emf.setJpaVendor(new HibernateJpaVendor());
+		..
+		return emf;
+	}
+}
+
+
+@Service
+public class AppService {
+	@Autowired
+	DataSource ds;
+
+	@PersistenceContext
+	EntityManager em;
+
+	public void addProduct(Product p) {
+		em.save(p);
+	}
+}
+
+```
+
+Spring Data Jpa --> is a layer on JPA simples CRUD operation
+a) creates DataSource using entiries present in application.properties
+b) creates EntityManagerFactory using entiries present in application.properties
+c) provides implementations classes for interfaces of type JpaRepository extends CrudRepository
+
+```
+public interface ProductDao extends JpaRepository<Product, Integer> {
+
+}
+```
+
+
+Spring Data JPA creates implmentation class for the "ProductDao" interface which has pre-defined methods for CRUD. [ means no @Repository class]
+
+@Autowired
+ProductDao productDao; // object of  generated implementiton class is wired
+
+
+Spring Initilizer project :
+
+mysql, jpa [ spring-data-jpa], lombok [code generation]
+
+By including Spring Data JPA we get:
+HikariCP, Hibernate as JPA Vendor
+
+https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+
+hbm-ddl operations: create, update, verify
+create: DDL on start of application; delete tables on application exit --> good for testing env
+update: create table if not exists, use tables if exist, alter table if required
+verify: We already have tables--> use them if mapping is appropriate. Don't allow alter
+
+spring.jpa.hibernate.ddl-auto=update
