@@ -901,6 +901,146 @@ em.save(item5);
 =====================
 
 
+```
+
+@Transactional ==> method level ==> one unit of work commit / rollback
+@Transactional --> Dirty checking [ any entity becomes dirty --> UPDATE is sent to DB]
+
+Version:
+```
+ update
+        products 
+    set
+        name=?,
+        price=?,
+        qty=?,
+        ver=? 
+    where
+        id=? 
+        and ver=?
+
+this helps in concurrency issues
+
+Without version:
+
+Client 1:
+	buys 4 items of iPhone
+	a) read from DB iPhone quantity --> 100
+	b) dirty --> 96
+
+client 2:
+	buys 3 items of iPhone
+	a) read from DB iPhone quantity --> 100
+	b) dirty --> 97
+
+Last Commit wins
+if client 1 finishes last --> product qty --> 96
+if client 2 finishes last --> product qty --> 97
+
+With Version:
+Client 1:
+	update
+        products 
+    set
+        qty=96,
+        ver = 1 
+    where
+        id= 1
+        and ver= 0
+	--> sets the version to 1
+Client 2:
+	update
+        products 
+    set
+        qty=96,
+        ver = 1 
+    where
+        id= 1
+        and ver = 0; // here condition fails
+
+		refresh() and update()
+```
+
+JP-QL --> uses class name and field names
+@Query("from Product where price >= :l and price <= :h")
+
+1) from Product where quantity = 100;
+2) select name from Product
+SQL --> uses table and column names
+
+1) select * from products where qty = 100;
+2) select name from products;
+
+ @Transactional is a must for custom mutation methods. 
+ built-in mutation methods are already transactional.
+
+ =================
+
+ Building RESTful WS
+  <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+  </dependency>
+This adds support for:
+1) Spring MVC --> traditional web application [SSR]
+2) RESTful WS
+3) Apache Tomcat Embedded Container [ other options can Jetty / Netty / Undertow /...]
+4) Jackson library for Java <--> JSON [ other options --> GSON / Jettison / Moxy /..]
+Jackson has ObjectMapper
+
+
+Http Headers:
+accept: application/json
+
+HttpMessageConverter
+ContentNegotiationHandler
+
+@Controller
+public class ProductController {
+
+	@RequestMapping("/product-page", method="GET")
+	public ModelAndView getProduct() {
+		List<Product> products = service.getProducts();
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("products", products);
+		mav.setView("productList");
+		return mav;
+	}
+
+	@RequestMapping("/product-page", method="GET", produces="application/json")
+	public @ResponseBody List<Product> getProducts() {
+		return 	
+	}
+}
+
+ViewResolver ==> pdf / jsp
+
+productList.jsp
+
+<c:forEach items={products} var="product">
+	<table>
+
+	</table>
+</c:forEach>
+
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+	@Autowired
+	OrderService service;
+	@GetMapping()
+	public List<Product> getProducts() {
+		return 	
+	}
+}
+
+
+* RESTful
+* Validation
+* Exception Handling
+* Cache --> redis
+* AOP
+* Metrics
 
 
 
