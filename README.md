@@ -1191,10 +1191,48 @@ PATCH http://localhost:8080/api/employee/1
 Content-type: application/json-patch+json
 body:
  [
-                        {"op": "replace", "path": "/title", "value" : "Team Lead"},
-                        {"op": "remove", "path": "/personal/phone"},
-                        {"op": "add", "path" :"/personal/email", "value": "raj@adobe.com"},
-                        {"op" : "add" , "path": "/programmingSkills/1" , "value": "AWS"}
-                    ]
+    {"op": "replace", "path": "/title", "value" : "Team Lead"},
+    {"op": "remove", "path": "/personal/phone"},
+	{"op": "add", "path" :"/personal/email", "value": "raj@adobe.com"},
+    {"op" : "add" , "path": "/programmingSkills/1" , "value": "AWS"}
+]
 ```
 
+AOP --> Aspect Oriented Programming to eliminate Cross-Cutting Concerns
+Cross-Cutting Concerns --> leads to code tangling and code code scattering
+--> logging, security, profile, transaction, ...
+
+Aspect: cross cutting concern
+JoinPoint: place where aspect can be weaved
+PointCut: selected joinpoint
+Advice: apply aspect to pointcut [ Before, After, AfterReturning, ThrowsAdvice, AroundAdvice]
+
+Validation:
+```
+
+<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+
+@NotBlank(message = "Name is required")
+	private String name;
+
+	@Min(value = 10, message = "Price ${validationValue} should be more than {value}")
+	private double price;
+
+
+	@Min(value = 0, message = "Price ${validationValue} should be more than {value}")
+	@Column(name="qty")
+	private int quantity;
+
+@Validated
+public class ProductController {
+	 public ResponseEntity<Product> addProduct(@RequestBody @Valid Product p) {
+```
+Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.adobe.orderapp.entity.Product> com.adobe.orderapp.api.ProductController.addProduct(com.adobe.orderapp.entity.Product) with 2 errors: [Field error in object 'product' on field 'price': rejected value [-45000.0]; codes [Min.product.price,Min.price,Min.double,Min]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [product.price,price]; arguments []; default message [price],10]; default message [Price -45000.0 should be more than 10]] [Field error in object 'product' on field 'name': rejected value []; codes [NotBlank.product.name,NotBlank.name,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [product.name,name]; arguments []; default message [name]]; default message [Name is required]] ]
+
+
+MethodArgumentNotValidException:  
+[default message [Name is required]] 
+[default message [Price -123 should be more than 10]] 

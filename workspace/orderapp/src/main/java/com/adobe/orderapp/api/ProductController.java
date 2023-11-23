@@ -1,11 +1,14 @@
 package com.adobe.orderapp.api;
 
 import com.adobe.orderapp.entity.Product;
+import com.adobe.orderapp.service.EntityNotFoundException;
 import com.adobe.orderapp.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,6 +18,7 @@ import java.util.List;
 @RequestMapping("api/products")
 //@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
+@Validated
 public class ProductController {
     private final OrderService service;
 
@@ -32,7 +36,7 @@ public class ProductController {
 
     // GET http://localhost:8080/api/products/3 --> Path parameter [ 3 is sent as string, spring has HttpMessageHandlers for primitive]
     @GetMapping("/{id}")
-    public Product getProduct(@PathVariable("id") int id)  {
+    public Product getProduct(@PathVariable("id") int id)  throws EntityNotFoundException {
         return service.getProductById(id);
     }
 
@@ -40,7 +44,7 @@ public class ProductController {
     // payload {name:"A", "price":11} ==> content-type:application/json
     @PostMapping()
 //    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Product> addProduct(@RequestBody Product p) {
+    public ResponseEntity<Product> addProduct(@RequestBody @Valid Product p) {
         p = service.addProduct(p);
         return new ResponseEntity<Product>(p, HttpStatus.CREATED);
     }

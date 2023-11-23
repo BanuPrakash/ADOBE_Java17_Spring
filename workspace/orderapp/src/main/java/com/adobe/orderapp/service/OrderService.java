@@ -72,8 +72,13 @@ public class OrderService {
         return productDao.getByRange(low, high);
     }
 
-    public Product getProductById(int id) {
-        return productDao.findById(id).get();
+    public Product getProductById(int id) throws EntityNotFoundException{
+        Optional<Product> opt = productDao.findById(id);
+        if(opt.isPresent()) {
+            return opt.get();
+        } else {
+            throw new EntityNotFoundException("Product with id " + id + " not present");
+        }
     }
 
 }
