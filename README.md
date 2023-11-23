@@ -1054,3 +1054,127 @@ http://host.docker.internal:9090
 * Metrics
 
 
+=================
+
+Day 4:
+
+Recap:
+Spring Data JPA with Hibernate ==> ORM
+* @Entity, @Id, @Column, @JoinColumn, @Table
+* JpaRepository ==> has pre-defined CRUD methods--> Spring Data JPA generates implmentatation class for  the interface
+* @Query, @Modification
+* JP-QL or SQL
+* PersistenceContext, EntityManagerFactory, DataSource and JpaVendor
+* @Transactional for declarative transaction instead of Programmatic Transaction
+
+```
+JDBC:
+public void task() {
+	try {
+		con.autoCommit(false);
+			// statement 1
+			// statement 2
+			// statement 3
+		con.commit(); 
+	} catch(SQLException ex) {
+		con.rollback();
+	}
+}
+
+ORM
+public void task() {
+	Transaction tx = em.beginTransaction();
+	try {
+			// statement 1
+			// statement 2
+			// statement 3
+		tc.commit(); 
+	} catch(SQLException ex) {
+		tx.rollback();
+	}
+}
+```
+
+Building RESTful Web Services:
+
+REST --> REpresentational State Transfer
+Resource: Any information that we can name can be a resource [file, database, Printer,..]
+Representation: State of the resource at any particular time. Consists of
+* data
+* metadata
+* hypermedia links --> Hypermedia as the Engine of application State [ HATEOAS]
+ serve products --> links to supplier, buy, add to wishlist, view details, ....
+ 
+ ```
+ http://server.com
+ payload
+ <get-slots>
+	<doctor id="1"/>
+ </get-slots>
+ OR
+ <book-appointment>
+	<doctor id="123" time="10:30" />
+ </book-appoint>
+
+ Guiding Principles of REST:
+ 1) Uniform interface: identify each resource uniquely
+ http://server.com/doctors
+ http://server.com/appointments/123
+ Manipulation of the resources through representation
+ Self-descriptive messages
+
+ 2) client-server [REST, SOAP, GraphQL]
+	seperation of concerns
+ 3) Stateless
+	each request from the client to the server must contains all the information neccessary to understand the complete request
+	: no Session Tracking on server
+4) Cacheable: response can be cacheable
+
+Identify resource using URL
+Identify actions using HTTP methods -> CRUD
+GET --> READ
+POST --> CREATE
+PUT / PATCH -> UPDATE
+DELETE -> DELETE
+ ```
+
+  <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+ </dependency>
+ * DispatcherServlet --> FrontController
+ * DispatcherServlet checks HandlerMappings to identify if there is a mapping to a particular HTTP request
+ * DispatcherServlet invokes [Controller / RestController methods]
+ * Returned Java data types is given to HttpMessageHandler to convert to different reporesentation
+ based on accept http header ==> json / xml / csv / atom ,...
+ * By default Jackson library is configured as ContentNegotiationHandler for Java <--> JSON
+
+install Postman --> testing API
+
+```
+POST  http://localhost:8080/api/products
+Headers
+Accept: application/json
+Content-type: application/json
+
+Body:
+raw --> json
+{
+    "name": "LG AC",
+    "price": 45000.00,
+    "quantity": 100
+}
+
+PUT http://localhost:8080/api/products/1
+Headers
+Accept: application/json
+Content-type: application/json
+
+Body:
+raw --> json
+{
+	 "price": 120000.50	
+}
+```
+=====
+
