@@ -18,8 +18,8 @@ import java.util.List;
 public class ProductController {
     private final OrderService service;
 
-    // http://localhost:8080/api/products
-    // GET http://localhost:8080/api/products?low=1000&high=50000
+    // GET http://localhost:8080/api/products
+    // GET http://localhost:8080/api/products?low=1000&high=50000 [ Query Parmater ]
     @GetMapping()
     public List<Product> getProducts(@RequestParam(name="low", defaultValue = "0.0") double low,
                                      @RequestParam(name="high", defaultValue = "0.0") double high) {
@@ -30,18 +30,22 @@ public class ProductController {
         }
     }
 
+    // GET http://localhost:8080/api/products/3 --> Path parameter [ 3 is sent as string, spring has HttpMessageHandlers for primitive]
     @GetMapping("/{id}")
     public Product getProduct(@PathVariable("id") int id)  {
         return service.getProductById(id);
     }
 
-    // POST {name:"A", "price":11} ==> content-type:application/json
+    // POST http://localhost:8080/api/products
+    // payload {name:"A", "price":11} ==> content-type:application/json
     @PostMapping()
+//    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Product> addProduct(@RequestBody Product p) {
         p = service.addProduct(p);
         return new ResponseEntity<Product>(p, HttpStatus.CREATED);
     }
 
+    // PUT http://localhost:8080/api/products/1
     @PutMapping("/{id}")
     public Product updateProduct(@PathVariable("id") int id, @RequestBody Product p)  {
         return service.updateProduct(id, p.getPrice());

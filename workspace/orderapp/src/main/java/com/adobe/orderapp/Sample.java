@@ -1,9 +1,7 @@
 package com.adobe.orderapp;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
-
 
 public class Sample {
     public static void main(String[] args) throws Exception{
@@ -33,7 +31,7 @@ public class Sample {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonPatch jsonPatch = JsonPatch.fromJson(mapper.readTree(patch));
-
+        System.out.println(jsonPatch);
         var target = jsonPatch.apply(mapper.readTree(s));
         System.out.println(target);
     }

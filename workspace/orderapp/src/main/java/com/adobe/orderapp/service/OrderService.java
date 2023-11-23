@@ -2,6 +2,7 @@ package com.adobe.orderapp.service;
 
 import com.adobe.orderapp.dao.OrderDao;
 import com.adobe.orderapp.dao.ProductDao;
+import com.adobe.orderapp.dto.ReportDTO;
 import com.adobe.orderapp.entity.Item;
 import com.adobe.orderapp.entity.Order;
 import com.adobe.orderapp.entity.Product;
@@ -19,6 +20,13 @@ public class OrderService {
     private final ProductDao productDao;
     private  final OrderDao orderDao;
 
+    public List<Order> getOrders() {
+        return  orderDao.findAll();
+    }
+
+    public  List<ReportDTO> getReport() {
+        return orderDao.getReport();
+    }
     /*
         {
             "customer": {"email":"rita@adobe.com"},

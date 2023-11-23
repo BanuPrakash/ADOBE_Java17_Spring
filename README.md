@@ -1178,3 +1178,23 @@ raw --> json
 ```
 =====
 
+JSON PATCH
+Partial update if we have complex data
+```
+<dependency>
+            <groupId>com.github.java-json-tools</groupId>
+            <artifactId>json-patch</artifactId>
+            <version>1.13</version>
+</dependency>
+
+PATCH http://localhost:8080/api/employee/1
+Content-type: application/json-patch+json
+body:
+ [
+                        {"op": "replace", "path": "/title", "value" : "Team Lead"},
+                        {"op": "remove", "path": "/personal/phone"},
+                        {"op": "add", "path" :"/personal/email", "value": "raj@adobe.com"},
+                        {"op" : "add" , "path": "/programmingSkills/1" , "value": "AWS"}
+                    ]
+```
+
