@@ -32,5 +32,5 @@ public class Item {
 	
 	private int quantity;
 	
-	private double amount;
+	private double amount; // product price * quantity + tax - discount
 }

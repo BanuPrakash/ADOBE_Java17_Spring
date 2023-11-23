@@ -1033,7 +1033,18 @@ public class ProductController {
 		return 	
 	}
 }
+docker run -d --name=some-redis -p 6379:6379 redis
 
+docker run --name=prometheus -d -p 9090:9090 -v /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
+
+
+docker cp  /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/rules.yml prometheus:/etc/prometheus/rules.yml
+
+
+docker run -d --name=grafana -p 3000:3000 grafana/grafana
+
+Grafana:
+http://host.docker.internal:9090
 
 * RESTful
 * Validation
@@ -1041,6 +1052,5 @@ public class ProductController {
 * Cache --> redis
 * AOP
 * Metrics
-
 
 

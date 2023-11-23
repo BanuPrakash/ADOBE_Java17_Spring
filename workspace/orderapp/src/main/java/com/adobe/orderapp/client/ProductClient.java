@@ -14,7 +14,7 @@ public class ProductClient implements CommandLineRunner {
     private OrderService service;
     @Override
     public void run(String... args) throws Exception {
-        //addProducts();
+       // addProducts();
         listProducts();
     }
 
@@ -27,14 +27,14 @@ public class ProductClient implements CommandLineRunner {
 
     private void addProducts() {
         Product p1 = Product.builder()
-                .name("iPhone 14")
-                .price(89000.00)
+                .name("Sony Bravia")
+                .price(189000.00)
                 .quantity(100)
                 .build();
 
         Product p2 = Product.builder()
-                .name("Wacom")
-                .price(8000.00)
+                .name("Logitech mouse")
+                .price(1200.00)
                 .quantity(100)
                 .build();
 
