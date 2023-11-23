@@ -1230,9 +1230,73 @@ Validation:
 public class ProductController {
 	 public ResponseEntity<Product> addProduct(@RequestBody @Valid Product p) {
 ```
-Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.adobe.orderapp.entity.Product> com.adobe.orderapp.api.ProductController.addProduct(com.adobe.orderapp.entity.Product) with 2 errors: [Field error in object 'product' on field 'price': rejected value [-45000.0]; codes [Min.product.price,Min.price,Min.double,Min]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [product.price,price]; arguments []; default message [price],10]; default message [Price -45000.0 should be more than 10]] [Field error in object 'product' on field 'name': rejected value []; codes [NotBlank.product.name,NotBlank.name,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [product.name,name]; arguments []; default message [name]]; default message [Name is required]] ]
 
 
 MethodArgumentNotValidException:  
 [default message [Name is required]] 
 [default message [Price -123 should be more than 10]] 
+
+=====
+
+Caching:
+* Client side Caching
+ -> Cache-Control
+ -> ETag
+	generally generated using int hashCode() --> changes whenever state changes
+	or use version
+* Server side Caching
+	--> Hibernate or any ORM provided caching --> Second Level Caching 
+	EHCaching
+* Middle tier caching
+
+ETag:
+
+    @GetMapping("/etag/{id}")
+    public ResponseEntity<Product> getProductCache(@PathVariable("id") int id)  throws EntityNotFoundException {
+        Product p = service.getProductById(id);
+        return ResponseEntity.ok().eTag(Integer.toString(p.hashCode())).body(p);
+    }
+
+	http://localhost:8080/api/products/etag/1
+	Response Header:
+	ETag: "1031070728"
+
+Subsequent Requests:
+client has to pass ETag
+Header:
+If-None-Match: "1031070728"
+
+Response : 304 Not Modified
+
+This removes payload; but server side code execution with DB hit is not stoped.
+
+======
+
+Caching @ middleware
+ <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+ </dependency>
+
+ConcurrentHashMap Cache implementation
+
+```
+@EnableCaching
+@SpringBootApplication
+public class OrderappApplication {
+}
+
+  @Cacheable(value="productCache", key = "#id")
+    @GetMapping("/cache/{id}")
+    public Product getProduct(@PathVariable("id") int id)  throws EntityNotFoundException {
+ 
+   @CachePut(value="productCache", key="#id")
+    @PutMapping("/{id}")
+    public Product updateProduct(@PathVariable("id") int id, @RequestBody Product p)  {
+        return service.updateProduct(id, p.getPrice());
+    }
+
+	 @CacheEvict(value = "productCache", key="#id")
+    @DeleteMapping("/{id}")
+
+```
