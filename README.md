@@ -1342,5 +1342,55 @@ public RedisCacheConfiguration cacheConfiguration() {
       .serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 }
 
-
 ```
+
+Consume RESTful WS in Spring boot application
+* RestTemplate --> limited to Synchrous API call
+* WebClient --> needs webflux dependecy which supports async operations
+ <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+ </dependency>
+
+webClient.get().url("/{name}/details", name)
+						.retrieve().body(Details.class);
+
+
+ HttpExchange Interfaces: Declarative HTTP Client using @HttpExchange.
+
+* RestClient --> Next version of Spring Boot [ 3.2 ]
+
+Rest Template:
+```
+ @Bean
+ RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return  builder.build();
+ }
+```
+
+tomcat Thread pool
+
+MakeMyTrip
+
+ThreadLocal can be used to store information in Thread
+
+FlightService
+
+HotelService
+
+
+@EnableAsync and @Async
+
+ExecutorService newThreadpool(10);
+newCachedPool();
+
+interface Runnable {
+	void run();
+}
+
+interface Callable<T> {
+	T call() throws Exception;
+}
+
+result = CompletableFuture.allOf(flightServiceFuture, hotelServiceFuture).join();
+Future<List<Post>> future = threadCode.exceute(); 

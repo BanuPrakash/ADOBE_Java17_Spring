@@ -64,11 +64,13 @@ public class ProductController {
     // POST http://localhost:8080/api/products
     // payload {name:"A", "price":11} ==> content-type:application/json
 
+    @Cacheable(value="productCache", key = "#p.id", condition = "#p.quantity > 0")
     @PostMapping()
 //    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Product> addProduct(@RequestBody @Valid Product p) {
+    public Product addProduct(@RequestBody @Valid Product p) {
         p = service.addProduct(p);
-        return new ResponseEntity<Product>(p, HttpStatus.CREATED);
+        return p;
+       // return new ResponseEntity<Product>(p, HttpStatus.CREATED);
     }
 
     // PUT http://localhost:8080/api/products/1
