@@ -1385,7 +1385,7 @@ Prometheus:
 * Time-series database
 * AlertManager
 * Scrape metrices from the provided endpoint [ Pull request]
-* It als0 provides HttpServer
+* It also provides HttpServer
 
 
 docker run --name=prometheus -d -p 9090:9090 -v /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
@@ -1396,6 +1396,13 @@ docker cp  /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/cod
 https://prometheus.io/docs/alerting/latest/configuration/
 
 docker run -d --name=grafana -p 3000:3000 grafana/grafana
+
+===================
+
+* Specification and EntityGraph
+* Reactive Programming
+* Security 
+* MicroService
 
 
 
