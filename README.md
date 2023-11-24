@@ -1033,18 +1033,7 @@ public class ProductController {
 		return 	
 	}
 }
-docker run -d --name=some-redis -p 6379:6379 redis
 
-docker run --name=prometheus -d -p 9090:9090 -v /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
-
-
-docker cp  /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/rules.yml prometheus:/etc/prometheus/rules.yml
-
-
-docker run -d --name=grafana -p 3000:3000 grafana/grafana
-
-Grafana:
-http://host.docker.internal:9090
 
 * RESTful
 * Validation
@@ -1280,23 +1269,78 @@ Caching @ middleware
 
 ConcurrentHashMap Cache implementation
 
+Configuration:
 ```
-@EnableCaching
-@SpringBootApplication
-public class OrderappApplication {
+docker run -d --name=some-redis -p 6379:6379 redis
+
+docker run --name=prometheus -d -p 9090:9090 -v /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
+
+
+docker cp  /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/rules.yml prometheus:/etc/prometheus/rules.yml
+
+
+docker run -d --name=grafana -p 3000:3000 grafana/grafana
+```
+--------------
+
+Day 5
+
+Recap: Restful WS, AOP, Exception Handling --> @ControllerAdvice, Validation javax.validation.constraints --> @Valid --> MethodArgumentNotValidException
+
+Caching:
+ETag for client-side caching
+If-None-Match: <etag value> --> SC 304 <<not modified>>
+
+Spring boot cache dependency ==> adds ConcurrentMapCache, CacheManager
+
+@Cacheable, @CachePut, @CacheEvit
+
+```
+ @Cacheable(value="productCache", key = "#p.id", condition = "#p.quantity > 0")
+    @PostMapping()
+//    @ResponseStatus(HttpStatus.CREATED)
+    public Product addProduct(@RequestBody @Valid Product p) {
+
+
+@Cacheable(value="productCache", key = "#id", unless="#result != null")
+    @GetMapping("/cache/{id}")
+    public Product getProductCache(@PathVariable("id") int id)  throws EntityNotFoundException {
+   
+
+// http://localhost:8080/api/products/cacheclear
+	@CacheEvit(value="productCache", allEntries="true")
+    @GetMapping("/cacheclear")
+	@Secure("ADMIN")
+    public void clear() {
+	}
+   
+```
+Redis as Cache Manager:
+```
+docker run -d --name=some-redis -p 6379:6379 redis
+
+ <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+application.properties
+
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+
+Redis Client
+npx redis-commander
+
+http://127.0.0.1:8081
+
+@Bean
+public RedisCacheConfiguration cacheConfiguration() {
+    return RedisCacheConfiguration.defaultCacheConfig()
+      .entryTtl(Duration.ofMinutes(60))
+      .disableCachingNullValues()
+      .serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 }
 
-  @Cacheable(value="productCache", key = "#id")
-    @GetMapping("/cache/{id}")
-    public Product getProduct(@PathVariable("id") int id)  throws EntityNotFoundException {
- 
-   @CachePut(value="productCache", key="#id")
-    @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable("id") int id, @RequestBody Product p)  {
-        return service.updateProduct(id, p.getPrice());
-    }
-
-	 @CacheEvict(value = "productCache", key="#id")
-    @DeleteMapping("/{id}")
 
 ```
