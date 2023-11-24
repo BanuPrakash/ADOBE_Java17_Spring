@@ -56,6 +56,7 @@ public class ProductController {
     }
 
     // GET http://localhost:8080/api/products/3 --> Path parameter [ 3 is sent as string, spring has HttpMessageHandlers for primitive]
+
     @GetMapping("/{id}")
     public Product getProduct(@PathVariable("id") int id)  throws EntityNotFoundException {
         return service.getProductById(id);

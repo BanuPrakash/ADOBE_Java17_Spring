@@ -1273,13 +1273,6 @@ Configuration:
 ```
 docker run -d --name=some-redis -p 6379:6379 redis
 
-docker run --name=prometheus -d -p 9090:9090 -v /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
-
-
-docker cp  /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/rules.yml prometheus:/etc/prometheus/rules.yml
-
-
-docker run -d --name=grafana -p 3000:3000 grafana/grafana
 ```
 --------------
 
@@ -1368,29 +1361,42 @@ Rest Template:
  }
 ```
 
-tomcat Thread pool
+* tomcat Thread pool
 
-MakeMyTrip
+* @EnableAsync and @Async
 
-ThreadLocal can be used to store information in Thread
+------------
 
-FlightService
+Observability: way application shares internal data like logging, metrics and traces
 
-HotelService
+    <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+http://localhost:8080/actuator
+http://localhost:8080/actuator/metrics	
+http://localhost:8080/actuator/metrics/http.server.requests
+
+Zipkin and Prometheus
 
 
-@EnableAsync and @Async
+Prometheus:
+* Time-series database
+* AlertManager
+* Scrape metrices from the provided endpoint [ Pull request]
+* It als0 provides HttpServer
 
-ExecutorService newThreadpool(10);
-newCachedPool();
 
-interface Runnable {
-	void run();
-}
+docker run --name=prometheus -d -p 9090:9090 -v /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
 
-interface Callable<T> {
-	T call() throws Exception;
-}
 
-result = CompletableFuture.allOf(flightServiceFuture, hotelServiceFuture).join();
-Future<List<Post>> future = threadCode.exceute(); 
+docker cp  /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/rules.yml prometheus:/etc/prometheus/rules.yml
+
+https://prometheus.io/docs/alerting/latest/configuration/
+
+docker run -d --name=grafana -p 3000:3000 grafana/grafana
+
+
+
+

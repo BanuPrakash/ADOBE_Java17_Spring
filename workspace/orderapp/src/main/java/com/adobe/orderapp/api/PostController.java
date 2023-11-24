@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class PostController {
     private final PostService postService;
     record PostDTO(String title, String user) {}
+
     @GetMapping()
     public List<PostDTO> getPosts() {
         CompletableFuture<List<Post>> posts = postService.getPosts(); // non-blocking

@@ -6,6 +6,7 @@ import com.adobe.orderapp.dto.ReportDTO;
 import com.adobe.orderapp.entity.Item;
 import com.adobe.orderapp.entity.Order;
 import com.adobe.orderapp.entity.Product;
+import io.micrometer.observation.annotation.Observed;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,7 @@ public class OrderService {
         return productDao.getByRange(low, high);
     }
 
+    @Observed(name="products.load-by-id", contextualName = "products.findById")
     public Product getProductById(int id) throws EntityNotFoundException{
         Optional<Product> opt = productDao.findById(id);
         if(opt.isPresent()) {
