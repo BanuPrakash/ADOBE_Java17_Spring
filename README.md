@@ -1393,17 +1393,48 @@ docker run --name=prometheus -d -p 9090:9090 -v /Users/banuprakash/Documents/cod
 
 docker cp  /Users/banuprakash/Documents/codes/Java/adobe/ADOBE_Java17_Spring/codes/rules.yml prometheus:/etc/prometheus/rules.yml
 
+restart prometheus
+
+
 https://prometheus.io/docs/alerting/latest/configuration/
 
 docker run -d --name=grafana -p 3000:3000 grafana/grafana
 
 ===================
 
+
 * Specification and EntityGraph
 * Reactive Programming
 * Security 
 * MicroService
 
+===================
+
+Day 6
+
+Day 5: Cache, RestTemplate, WebClient, Declarative Client HttpExchange, @EnableAsync and @Async
+
+Observation concepts: Observation is the actual recording of something happening in your application
+[health, info, metrics] 
+
+Spring Boot Actuator --> is a module provides endpoints for health, info and metrics used for monitoring
+MicroServices [ Discovery service has to keep checking other microservices are UP/DOWN]
+
+Prometheus --> Time Series Database, Pull requests to scrape data from endpoints, Web server.
+
+Zipkin: for traces
 
 
+Apache Deamon Server for Apache Benchmark [ab by default is available in Mac]
+
+ab -c 100 -n 500 http://localhost:8080/api/products/1
+
+ab -c 2 -n 5 http://localhost:8080/api/posts
+
+
+http_server_requests_seconds_count
+http_server_requests_seconds_sum
+
+jvm_threads_peak_threads
+jvm_threads_live_threads
 
