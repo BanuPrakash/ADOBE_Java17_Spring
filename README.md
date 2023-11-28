@@ -1551,5 +1551,95 @@ http://localhost:8080/api/products/
 http://localhost:8080/api/products/search?findByQuantity=100
 
 ======
+Customize Configuration:
+```
+@Configuration
+public class RestConfig implements RepositoryRestConfigurer {
+    @Override
+    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
+      // cors.addMapping("/api/products").allowedOrigins("http://domain2/");
+      ExposureConfiguration expConfig =  config.getExposureConfiguration();
+      expConfig.forDomainType(Product.class)
+              .withItemExposure( (metadata, httpMethods) -> {
+                  return httpMethods.disable(HttpMethod.DELETE);
+              });
+    }
+}
 
-@11:20
+```
+Don't use @RestController in spring data rest. ==> you need to do all the configiration from scratch
+instead we have @BasePathAwareController or @RepositoryRestController
+@BasePathAwareController ==> to override exisiting endpoints
+@RepositoryRestController ==> to add additional endpoints
+
+For Customization:
+ <dependency>
+            <groupId>org.springframework.hateoas</groupId>
+            <artifactId>spring-hateoas</artifactId>
+ </dependency>
+
+====================================
+
+Reactive Programming:
+Declarative programming paradigm concerned with data streams and propagation of change.
+
+React to something: User clicks on button, run this function
+
+Solution to Sequential Execution:
+1) @EnableAsync and @Async with Future and CompletableFuture
+Problem still is Tomcat Thread / Servlet Container Thread is blocked
+In tomcat thread code:
+future.get(); // blocked
+futures.join(flightsFuture, hotelsFuture); // blocked
+
+2) tomcat Thread need not waiting
+```
+Mono<User> getUser(id) {
+	return userService.getUser(id)
+		.zipWith(userPreferenceService.getPreference(id))
+		.map( tuple -> {
+			User user = tuple.getT1();
+			user.setPreferences(getT2());
+		});
+}
+```
+
+Iterator Pattern: iter.next();
+
+Observer Pattern: Subject maintains a state and has list of observers. notify observers whene state changes automatically
+
+
+* RxJava
+* Netty reactor
+* Vert-X
+
+-> Spring Webflux instead of Spring web
+-> Netty server instead of Apache Tomcat
+
+Never use this for CPU intense operations [blocking code], RDBMS
+Use this for Non-blocking Operations [ NIO] , Stream based operations, r2dbms
+MongoReactive, PostgresReactive
+
+Producers:
+Mono
+	0 or 1 element
+Flux
+	0 ... n elements
+```
+Flux<Long> clockTicks = Flux.interval(Duration.ofSeconds(1));
+//Flux<Long> clockTicks = Flux.interval(Duration.ofSeconds(1)).share(); --> Multicast
+    clockTicks.subscribe(tick -> System.out.println("clock 1: " + tick + " s"));
+
+    Thread.sleep(2000);
+
+	clockTicks.subscribe(tick -> System.out.println("clock 2 :" + tick + " s"));
+```
+
+
+
+
+
+
+
+
+
