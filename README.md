@@ -1438,3 +1438,99 @@ http_server_requests_seconds_sum
 jvm_threads_peak_threads
 jvm_threads_live_threads
 
+workspace/actuator-demo.zip
+```
+=====================================
+
+HATEOAS ==> Hypermedia As The Extension Of Application State
+https://martinfowler.com/articles/richardsonMaturityModel.html
+
+Level 0:
+<add-product>
+	<name>iPhone</name>
+</add-product>
+
+<get-product id="1" />
+
+Level 1:
+http://server.com/products
+http://server.com/orders
+
+Level 2: GET, POST, PUT, DELETE, PATCH
+http://server.com/products
+
+Level 3: Hypermedia Controls	
+
+```
+a) GET /doctors/mjones/slots?date=20100104&status=open
+
+Response
+<openSlotList>
+  <slot id = "1234" doctor = "mjones" start = "1400" end = "1450">
+     <link rel = "/linkrels/slot/book" 
+           uri = "/slots/1234"/>
+  </slot>
+  <slot id = "5678" doctor = "mjones" start = "1600" end = "1650">
+     <link rel = "/linkrels/slot/book" 
+           uri = "/slots/5678"/>
+  </slot>
+</openSlotList>
+
+b) POST /slots/1234
+
+<appointmentRequest>
+  <patient id = "jsmith"/>
+</appointmentRequest>
+
+Response:
+
+<appointment>
+  <slot id = "1234" doctor = "mjones" start = "1400" end = "1450"/>
+  <patient id = "jsmith"/>
+  <link rel = "/linkrels/appointment/cancel"
+        uri = "/slots/1234/appointment"/>
+  <link rel = "/linkrels/appointment/addTest"
+        uri = "/slots/1234/appointment/tests"/>
+  <link rel = "self"
+        uri = "/slots/1234/appointment"/>
+  <link rel = "/linkrels/appointment/changeTime"
+        uri = "/doctors/mjones/slots?date=20100104&status=open"/>
+  <link rel = "/linkrels/appointment/updateContactInfo"
+        uri = "/patients/jsmith/contactInfo"/>
+  <link rel = "/linkrels/help"
+        uri = "/help/appointment"/>
+</appointment>
+```
+1234
+mjones
+Start Time: 2:00
+End time: 2:50
+<a href="/slots/1234/appointment/tests">Add Tests</a>
+<a href="/doctors/mjones/slots?date=20100104&status=open">Change time</a>
+
+====
+
+ <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-hateoas</artifactId>
+</dependency>
+
+WebMvcLinkBuilder --> builder to build Link instances 
+RepresentationModel ==> entity state + Link
+EntityModel [Product] / CollectionModel [List<Product>]
+
+@EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL_FORMS)
+
+```
+ @GetMapping("/hateoas/{id}")
+    public EntityModel<Product> getProductHateos(@PathVariable("id") int id)  throws EntityNotFoundException {
+        Product p = service.getProductById(id);
+        EntityModel<Product> entityModel = EntityModel.of(p,
+                linkTo(methodOn(ProductController.class).getProductHateos(id))
+                        .withSelfRel()
+                        .andAffordance(afford(methodOn(ProductController.class).updateProduct(id, null)))
+                        .andAffordance(afford(methodOn(ProductController.class).delete(id))),
+                linkTo(methodOn(ProductController.class).getProducts(0,0)).withRel("products"));
+        return entityModel;
+    }
+```
