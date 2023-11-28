@@ -1522,6 +1522,7 @@ EntityModel [Product] / CollectionModel [List<Product>]
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL_FORMS)
 
 ```
+ProductController:
  @GetMapping("/hateoas/{id}")
     public EntityModel<Product> getProductHateos(@PathVariable("id") int id)  throws EntityNotFoundException {
         Product p = service.getProductById(id);
@@ -1534,3 +1535,21 @@ EntityModel [Product] / CollectionModel [List<Product>]
         return entityModel;
     }
 ```
+
+Spring Data REST:
+is part of the umbrella Spring Data project and makes it easy to build hypermedia-driven REST web services on top of Spring Data repositories.
+* Just need to create interfaces extends JpaRepository / MongoRepository/ ...
+* Spring Data REST creates endpoints for methods of interfaces [ no need for explict RestController]
+
+   <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+    </dependency>
+
+http://localhost:8080/api/products/search/getByRange?l=100&h=2000
+http://localhost:8080/api/products/
+http://localhost:8080/api/products/search?findByQuantity=100
+
+======
+
+@11:20
