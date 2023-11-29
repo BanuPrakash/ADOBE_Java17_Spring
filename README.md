@@ -1635,7 +1635,26 @@ Flux<Long> clockTicks = Flux.interval(Duration.ofSeconds(1));
 	clockTicks.subscribe(tick -> System.out.println("clock 2 :" + tick + " s"));
 ```
 
+Day 7
+Security, EntityGraph and Specification
 
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+ </dependency>
+-> this creates a default user --> user and generated pwd: 3815caa5-f550-4fc6-bc79-67e2079bf51e
+-> creates login page
+-> creates logout page [ http://localhost:8080/logout]
+-> makes all resources as protected
+
+
+AuthenticationFilter
+UsernamePasswordAuthenticationFilter
+
+spring.security.user.name=jack
+spring.security.user.password=secret123
+
+=========
 
 
 
