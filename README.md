@@ -1656,6 +1656,90 @@ spring.security.user.password=secret123
 
 =========
 
+users in RDBMS instead of InMemory --> Security
+
+https://docs.spring.io/spring-security/reference/servlet/appendix/database-schema.html
+
+SecurityConfig
+@Autowired
+DataSource ds;
+
+@Autowired
+public void configure(AuthenticationManagerBuilder auth) {
+	auth.jdbcAuthentication().dataSource(ds);
+}
+
+@Bean
+public PasswordEncoder bcryptEncoder() {
+	return new BCryptPasswordEncoder();
+}
+==
+
+For custom tables ==> UserDetailsService
+
+===========
+
+JWT --> Json Web Token
+Characteristics of RESTful --> Stateless
+
+```
+public enum Role {
+    ROLE_USER,
+    ROLE_ADMIN
+}
+
+User class
+SignInRequest, SignUpRequest
+
+UserService
+JwtService
+
+Service to register and login ==> AuthenticationService
+```
+Register:
+```
+POST http://localhost:8080/api/auth/register
+body:
+
+{
+    "firstName": "Gavin",
+    "lastName": "King",
+    "email": "gavin@gmail.com",
+    "password": "secret"
+}
+Respose:
+{
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJnYXZpbkBnbWFpbC5jb20iLCJpYXQiOjE3MDEyNDM0MjIsImV4cCI6MTcwMTI0NDg2Miwicm9sZXMiOlsiUk9MRV9VU0VSIl19.ZdiXl67LtdFCL_wwofw2o6gZGn2N3B9dkdikI4uM6ng"
+}
+
+mysql> select * from users;
++----+-----------------+------------+-----------+--------------------------------------------------------------+-----------+
+| id | email           | first_name | last_name | password                                                     | role      |
++----+-----------------+------------+-----------+--------------------------------------------------------------+-----------+
+|  4 | gavin@gmail.com | Gavin      | King      | $2a$10$VRKq6SywI.M9ctqMYeArtOdEKuAgY7ZjhTbfevDVZzdh399Z7hHOG | ROLE_USER |
++----+-----------------+------------+-----------+--------------------------------------------------------------+-----------+
+
+```
+
+Login:
+```
+POST: http://localhost:8080/api/auth/login
+{
+    "email": "gavin@gmail.com",
+    "password": "secret"
+}
+
+{
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJnYXZpbkBnbWFpbC5jb20iLCJpYXQiOjE3MDEyNDM2NzAsImV4cCI6MTcwMTI0NTExMCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.BQ8MiAdYDa2Pn_VdGfAGbrSwc1gQifWexTcKpUrvGV4"
+}
+
+```
+
+Restricted Resources
+
+GET http://localhost:8080/api/products
+
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJnYXZpbkBnbWFpbC5jb20iLCJpYXQiOjE3MDEyNDM2NzAsImV4cCI6MTcwMTI0NTExMCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.BQ8MiAdYDa2Pn_VdGfAGbrSwc1gQifWexTcKpUrvGV4
 
 
 
