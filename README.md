@@ -1741,8 +1741,100 @@ GET http://localhost:8080/api/products
 
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJnYXZpbkBnbWFpbC5jb20iLCJpYXQiOjE3MDEyNDM2NzAsImV4cCI6MTcwMTI0NTExMCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.BQ8MiAdYDa2Pn_VdGfAGbrSwc1gQifWexTcKpUrvGV4
 
+=============
+
+Day 8
+
+EntityGraph --> Performance of JPA Queries
+ @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+
+ CompanyWithDepartment:
+
+ ```
+  select
+        company0_.id as id1_2_0_,
+        department1_.id as id1_3_1_,
+        company0_.name as name2_2_0_,
+        department1_.company_id as company_3_3_1_,
+        department1_.name as name2_3_1_,
+        department1_.company_id as company_3_3_0__,
+        department1_.id as id1_3_0__ 
+    from
+        company company0_ 
+    left outer join
+        department department1_ 
+            on company0_.id=department1_.company_id 
+    where
+        company0_.id=?
+ ```
+
+ companyWithDepartmentsAndEmployeesAndOfficesGraph
+
+ ```
+  select
+        company0_.id as id1_2_0_,
+        department1_.id as id1_3_1_,
+        offices2_.id as id1_5_2_,
+        employees3_.id as id1_4_3_,
+        company0_.name as name2_2_0_,
+        department1_.company_id as company_3_3_1_,
+        department1_.name as name2_3_1_,
+        department1_.company_id as company_3_3_0__,
+        department1_.id as id1_3_0__,
+        offices2_.address_id as address_3_5_2_,
+        offices2_.department_id as departme4_5_2_,
+        offices2_.name as name2_5_2_,
+        offices2_.department_id as departme4_5_1__,
+        offices2_.id as id1_5_1__,
+        employees3_.address_id as address_4_4_3_,
+        employees3_.department_id as departme5_4_3_,
+        employees3_.name as name2_4_3_,
+        employees3_.surname as surname3_4_3_,
+        employees3_.department_id as departme5_4_2__,
+        employees3_.id as id1_4_2__ 
+    from
+        company company0_ 
+    left outer join
+        department department1_ 
+            on company0_.id=department1_.company_id 
+    left outer join
+        office offices2_ 
+            on department1_.id=offices2_.department_id 
+    left outer join
+        employee employees3_ 
+            on department1_.id=employees3_.department_id 
+    where
+        company0_.id=?
+ ```
+
+ Specification: --> Dynamic Queries based on CriteriaAPI
+ The Criteria API allows us to build up a criteria query object programmatically,
+
+ =========================
+
+ MicroServices
+ Spring Cloud --> Spring Boot
+
+ 1) Maven project --> mircoservices --> packing pom
+ 2) new module --> discovery-server --> dependency --> Eureka Server
+
+2.1) @SpringBootApplication
+@EnableEurekaServer
+public class DiscoveryServerApplication {
+
+2.2) application.yml
+
+http://localhost:8761/eureka < -- discover client will access 
+
+http://localhost:8761/
+
+3) Add Student Service
+new module --> student-service
+dependency 
+eureka-client
+mysql, jpa, lombok, web, actuator
 
 
-
+POST http://localhost:8090/api/students
 
 
